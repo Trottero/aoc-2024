@@ -1,0 +1,5 @@
+.aoc-2024
+__pycache__
+.pytest_cache
+aoc_2024.egg-info
+.venv
