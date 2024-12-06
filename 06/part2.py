@@ -9,44 +9,55 @@ def p2(input: list[str]) -> int:
 
     agent_pos_og, obstacles = map_elements(input_m)
 
-    lines = set()
+    # Perform baseline run to get search space
+    looped, visited = perform_run(
+        agent_pos_og, (0, -1), obstacles, bounds)
+
+    space = [(e[0], e[1]) for e in visited]
 
     valid_new_obstacles = set()
-    for y in trange(len(input_m)):
-        for x in range(len(input_m[y])):
-            agent_pos = agent_pos_og
-            agent_dir = (0, -1)
-            run_obstacles = obstacles.copy()
-            run_obstacles.add((x, y))
-            if len(run_obstacles) == len(obstacles):
-                continue
+    for x, y in space:
+        agent_pos = agent_pos_og
+        agent_dir = (0, -1)
+        run_obstacles = obstacles.copy()
+        run_obstacles.add((x, y))
+        if len(run_obstacles) == len(obstacles):
+            continue
 
-            ax, ay = agent_pos
-            visited = set((ax, ay, agent_dir))
-
-            while True:
-                dx, dy = agent_dir
-
-                # traverse
-                ax += dx
-                ay += dy
-
-                # check bounds
-                if not (0 <= ax < bounds[0] and 0 <= ay < bounds[1]):
-                    break
-
-                # check collision
-                if (ax, ay) in run_obstacles:
-                    ax -= dx
-                    ay -= dy
-                    agent_dir = cw90(agent_dir)
-                    if (ax, ay, agent_dir) in visited:
-                        valid_new_obstacles.add((x, y))
-                        break
-
-                visited.add((ax, ay, agent_dir))
+        looped, visited = perform_run(
+            agent_pos, agent_dir, run_obstacles, bounds)
+        if looped:
+            valid_new_obstacles.add((x, y))
 
     return len(valid_new_obstacles)
+
+
+def perform_run(agent_pos, agent_dir, obstacles, bounds) -> tuple[bool, set[tuple[int, tuple[int, int]]]]:
+    ax, ay = agent_pos
+    visited = set([(ax, ay, agent_dir)])
+
+    while True:
+        dx, dy = agent_dir
+
+        # traverse
+        ax += dx
+        ay += dy
+
+        # check bounds
+        if not (0 <= ax < bounds[0] and 0 <= ay < bounds[1]):
+            break
+
+        # check collision
+        if (ax, ay) in obstacles:
+            ax -= dx
+            ay -= dy
+            agent_dir = cw90(agent_dir)
+            if (ax, ay, agent_dir) in visited:
+                return True, visited
+
+        visited.add((ax, ay, agent_dir))
+
+    return False, visited
 
 
 def cw90(v: tuple[int, int]) -> tuple[int, int]:
