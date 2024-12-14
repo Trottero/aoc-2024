@@ -4,5 +4,6 @@ __pycache__
 aoc_2024.egg-info
 lib/common.egg-info/
 lib/common/common.egg-info/
+14/images
 
 .venv
