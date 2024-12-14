@@ -26,6 +26,9 @@ def test_p1(filename, expected):
         pytest.param(
             "12/test_input.txt", 80, id="Day 12 Part 2 - Test Input",
         ),
+        pytest.param(
+            "12/test_input_1.txt", 436, id="Day 12 Part 2 - Test Input",
+        ),
     ],
 )
 def test_p2(filename, expected):
